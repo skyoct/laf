@@ -9,3 +9,27 @@ spec:
     url: http://apisix-admin.{{ .Release.Namespace }}.svc.cluster.local:9180/apisix/admin
   domain: {{ .Values.global.domain }}
   region: {{ .Values.global.region }}
+---
+apiVersion: gateway.laf.dev/v1
+kind: Domain
+metadata:
+  name: default-domain
+spec:
+  backendType: bucket
+  cluster:
+    key: {{ .Values.apisix.admin.credentials.admin }}
+    url: http://apisix-admin.{{ .Release.Namespace }}.svc.cluster.local:9180/apisix/admin
+  domain: {{ .Values.global.domain }}
+  region: {{ .Values.global.region }}
+---
+apiVersion: gateway.laf.dev/v1
+kind: Domain
+metadata:
+  name: default-domain
+spec:
+  backendType: website
+  cluster:
+    key: {{ .Values.apisix.admin.credentials.admin }}
+    url: http://apisix-admin.{{ .Release.Namespace }}.svc.cluster.local:9180/apisix/admin
+  domain: {{ .Values.global.domain }}
+  region: {{ .Values.global.region }}
