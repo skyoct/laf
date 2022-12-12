@@ -1,7 +1,7 @@
 apiVersion: gateway.laf.dev/v1
 kind: Domain
 metadata:
-  name: default-domain
+  name: default-app-domain
 spec:
   backendType: app
   cluster:
@@ -13,7 +13,7 @@ spec:
 apiVersion: gateway.laf.dev/v1
 kind: Domain
 metadata:
-  name: default-domain
+  name: default-bucket-domain
 spec:
   backendType: bucket
   cluster:
@@ -25,7 +25,7 @@ spec:
 apiVersion: gateway.laf.dev/v1
 kind: Domain
 metadata:
-  name: default-domain
+  name: default-website-domain
 spec:
   backendType: website
   cluster:
