@@ -3,6 +3,7 @@
  ***************************/
 
 import React, { DragEventHandler, useCallback, useEffect, useMemo, useState } from "react";
+import { useContextMenu } from "react-contexify";
 import { useNavigate, useParams } from "react-router-dom";
 import { AddIcon, Search2Icon } from "@chakra-ui/icons";
 import {
@@ -20,12 +21,14 @@ import { cloneDeep } from "lodash";
 
 import {
   EditIconLine,
+  LinkIcon,
   RecycleBinIcon,
   RecycleDeleteIcon,
   TriggerIcon,
 } from "@/components/CommonIcon";
 import ConfirmButton from "@/components/ConfirmButton";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
+import CopyText from "@/components/CopyText";
 import EmptyBox from "@/components/EmptyBox";
 import FileTypeIcon, { FileType } from "@/components/FileTypeIcon";
 import IconText from "@/components/IconText";
@@ -43,6 +46,7 @@ import {
 import useFunctionStore from "../../store";
 import TriggerModal from "../TriggerModal";
 
+import ContextMenu from "./ContextMenu";
 import CreateModal from "./CreateModal";
 
 import "./index.css";
@@ -113,6 +117,8 @@ export default function FunctionList() {
   const [tagsList, setTagsList] = useState<TagItem[]>([]);
 
   const [currentTag, setCurrentTag] = useState<TagItem | null>(null);
+
+  const { show, hideAll } = useContextMenu();
 
   const generateRoot = useCallback(
     (data: TFunction[]) => {
@@ -348,6 +354,24 @@ export default function FunctionList() {
             onDragStart={onDragStart}
             data-func={item.name}
             data-is-func-dir={!!item.children?.length}
+            onContextMenu={(e) => {
+              const sidebarWidth =
+                JSON.parse(localStorage.getItem("laf_custom_setting") || "").state.layoutInfo
+                  .functionPage.SideBar.style.width || 0;
+              if (!!item.children?.length) return;
+              if (e.clientX > sidebarWidth - 120) {
+                show({
+                  event: e,
+                  id: item._id,
+                  position: {
+                    x: e.clientX - 120,
+                    y: e.clientY,
+                  },
+                });
+              } else {
+                show({ event: e, id: item._id });
+              }
+            }}
           >
             <div
               className="flex items-center overflow-hidden text-ellipsis whitespace-nowrap font-medium"
@@ -394,11 +418,29 @@ export default function FunctionList() {
                         className="hover:!text-error-600"
                       />
                     </ConfirmButton>
+                    <CopyText text={`${currentApp.origin}/${item.name}`} hideToolTip>
+                      <IconText
+                        icon={
+                          <div className="flex h-5 items-center">
+                            <LinkIcon fontSize={22} />
+                          </div>
+                        }
+                        text={t("Copy")}
+                        className="hover:!text-primary-400"
+                      />
+                    </CopyText>
                   </>
                 </MoreButton>
               </HStack>
             )}
           </SectionList.Item>
+          {item._id && (
+            <ContextMenu
+              functionItem={item as unknown as TFunction}
+              tagsList={tagsList.map((item) => item.tagName)}
+              hideAll={hideAll}
+            />
+          )}
           {item.isExpanded && item?.children?.length && renderSectionItems(item.children)}
         </React.Fragment>
       );
